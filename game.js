@@ -46,6 +46,7 @@ const save=()=>{S.caught=[...CAUGHT];try{localStorage.setItem(KEY,JSON.stringify
    digerakkan dengan CSS; kalau semua gagal, emoji tipe. */
 const GIF=id=>`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/${id}.gif`;
 const ART=id=>`img/${id}.webp`;
+const ART_HI=id=>`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
 let gifBroken=false;
 function pic(p,o={}){
   const w=h('div','pic');if(o.s)w.style.setProperty('--s',o.s);
@@ -57,6 +58,12 @@ function pic(p,o={}){
   im.onerror=()=>{
     if(im.dataset.f==='gif'){im.dataset.f='art';w.classList.replace('live','still');im.src=ART(p.id)}
     else{bod.innerHTML='';bod.append(h('span','emo',p.e))}
+  };
+  // tajamkan: sprite kecil yang diperbesar pakai piksel tegas; gambar besar pakai resolusi tinggi
+  im.onload=()=>{
+    const dpr=window.devicePixelRatio||1,shown=w.clientWidth*dpr;if(!shown)return;
+    if(im.dataset.f==='gif')im.classList.toggle('px',im.naturalWidth*1.3<shown);
+    else if(im.dataset.f==='art'&&shown>300&&!im.dataset.hi){im.dataset.hi=1;const hi=new Image();hi.onload=()=>{im.src=hi.src};hi.src=ART_HI(p.id)}
   };
   im.src=gif?GIF(p.id):ART(p.id);bod.append(im);w.p=p;return w;
 }
@@ -164,11 +171,20 @@ function gain(p,speakIt=false,pre=''){
   const fresh=!CAUGHT.has(p.id);
   if(fresh){CAUGHT.add(p.id);save()}
   if(!fresh&&!pre)return false;
-  const t=h('div','toast');t.append(pic(p),document.createTextNode((pre?pre+' ':'')+(fresh?`Kamu dapat ${p.n}!`:`${p.n} datang lagi!`)));
-  document.body.append(t);setTimeout(()=>t.remove(),3100);
+  flyToDex(p,fresh?'Baru!':'');
   if(speakIt&&fresh)setTimeout(()=>speak(`${pre} Hore, kamu dapat ${p.n}!`),250);
   return fresh;
 }
+
+// Pokémon baru terbang ke tombol Koleksi, tanpa menutupi permainan
+function flyToDex(p,label){
+  const d=$('#dexBtn').getBoundingClientRect(),tx=d.left+d.width/2,ty=d.top+d.height/2;
+  const f=h('div','fx catchfly');const pp=pic(p,{s:'72px',calm:true});f.append(pp);if(label)f.append(h('span','newtag',label));document.body.append(f);
+  const sx=innerWidth/2,sy=innerHeight*.45;
+  if(RM){f.remove();bumpDex();return}
+  f.animate([{transform:`translate(${sx}px,${sy}px) translate(-50%,-50%) scale(.2)`,opacity:0},{transform:`translate(${sx}px,${sy-40}px) translate(-50%,-50%) scale(1.3)`,opacity:1,offset:.25},{transform:`translate(${sx}px,${sy-50}px) translate(-50%,-50%) scale(1.2)`,opacity:1,offset:.5},{transform:`translate(${tx}px,${ty}px) translate(-50%,-50%) scale(.3)`,opacity:.7}],{duration:1500,easing:'ease-in-out'}).onfinish=()=>{f.remove();bumpDex()};
+}
+function bumpDex(){const b=$('#dexBtn');b.classList.remove('bump2');void b.offsetWidth;b.classList.add('bump2')}
 
 /* ================= lingkup permainan ================= */
 function scope(){
@@ -732,8 +748,8 @@ function order(root,sc,lv){
     if(q>=ROUNDS)return party('Kamu hafal urutan evolusi!');
     q++;const ch=randomChain(lv>=3?3:2).slice(0,lv>=3?3:2);
     box.innerHTML='';box.classList.remove('enter');void box.offsetWidth;box.classList.add('enter');
-    const top=h('div','opts'),bot=h('div','opts');let step=0;
-    const holes=ch.map((_,i)=>{const s=h('div','opt','<span style="font-family:var(--display);font-weight:800;font-size:40px;width:clamp(62px,min(19vw,16vh),124px);height:clamp(62px,min(19vw,16vh),124px);display:grid;place-items:center;opacity:.35">'+(i+1)+'</span>');top.append(s);if(i<ch.length-1)top.append(h('b',null,'<span style="font-size:34px;color:#fff;align-self:center">➜</span>'));return s});
+    const top=h('div','opts ord'),bot=h('div','opts ordb');let step=0;
+    const holes=ch.map((_,i)=>{const s=h('div','opt hole2','<span>'+(i+1)+'</span>');top.append(s);if(i<ch.length-1)top.append(h('span','arrow','➜'));return s});
     shuffle(ch).forEach((p,i)=>{const b=h('button','opt popin');b.style.animationDelay=i*100+'ms';const pp=pic(p);b.append(pp,h('b',null,p.n));
       b.onclick=()=>{if(p===ch[step]){sfx.pop();const hole=holes[step];hole.innerHTML='';const np=pic(p);hole.append(np);hole.classList.add('yes','popin');act(np,'hop');b.style.visibility='hidden';step++;
           gain(p);
@@ -991,8 +1007,8 @@ async function installApp(){
   sfx.pop();
   if(installEvt){installEvt.prompt();const r=await installEvt.userChoice.catch(()=>null);installEvt=null;if(r&&r.outcome==='accepted')return}
   const ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1),android=/Android/.test(ua);
-  const steps=ios?['Buka halaman ini di <b>Safari</b>.','Ketuk tombol <b>Bagikan</b> (kotak dengan panah ke atas ⬆️).','Gulir ke bawah, pilih <b>Tambah ke Layar Utama</b>.','Ketuk <b>Tambah</b>. Ikon Squirtle muncul di layar utama.']
-    :android?['Buka halaman ini di <b>Chrome</b>.','Ketuk menu <b>⋮</b> di pojok kanan atas.','Pilih <b>Instal aplikasi</b> atau <b>Tambahkan ke layar utama</b>.','Ketuk <b>Instal</b>. Ikon Squirtle muncul di daftar aplikasi.']
+  const steps=ios?['Buka halaman ini di <b>Safari</b>.','Ketuk tombol <b>Bagikan</b> (kotak dengan panah ke atas ⬆️).','Gulir ke bawah, pilih <b>Tambah ke Layar Utama</b>.','Ketuk <b>Tambah</b>. Ikon Lugia muncul di layar utama.']
+    :android?['Buka halaman ini di <b>Chrome</b>.','Ketuk menu <b>⋮</b> di pojok kanan atas.','Pilih <b>Instal aplikasi</b> atau <b>Tambahkan ke layar utama</b>.','Ketuk <b>Instal</b>. Ikon Lugia muncul di daftar aplikasi.']
     :['Di Chrome atau Edge, klik ikon <b>Instal</b> di ujung kanan kolom alamat.','Di HP, buka alamat halaman ini lalu ketuk tombol <b>📲 Pasang di HP</b>.'];
   const o=h('div','party'),b=h('div','box help');
   b.append(h('h2',null,'📲 Pasang di '+(ios?'iPhone':android?'Android':'perangkat ini')));
