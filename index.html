@@ -94,7 +94,7 @@ img{max-width:100%;-webkit-user-drag:none}
 @media (min-width:1000px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .tile{position:relative;background:var(--paper);border-radius:var(--r);padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 7px 0 var(--c,var(--coral));border:4px solid var(--c,var(--coral));transition:transform .12s;min-height:150px;justify-content:center;overflow:hidden}
 .tile:active{transform:translateY(5px);box-shadow:0 2px 0 var(--c)}
-.tile .pic{--s:clamp(58px,13vmin,92px)}
+.tile .pic{--s:clamp(54px,12vmin,88px)}
 .tile .big{position:absolute;top:6px;right:8px;font-size:26px;line-height:1}
 .tile b{font-family:var(--display);font-weight:800;font-size:clamp(18px,3.4vw,25px);line-height:1.05;text-align:center}
 .tile small{font-weight:700;font-size:14px;opacity:.7;text-align:center;line-height:1.2}
@@ -105,10 +105,14 @@ img{max-width:100%;-webkit-user-drag:none}
 .foot{font-size:13px;color:var(--paper);opacity:.92;text-align:center;max-width:65ch;margin:0 auto;font-weight:700;line-height:1.4}
 
 /* karakter Pokémon: .pic > .bod > img. Gerakan idle di .bod, aksi (lompat, putar) lewat Web Animations */
-.pic{--s:96px;width:var(--s);height:var(--s);display:grid;place-items:center;position:relative;flex:none}
-.bod{width:100%;height:100%;display:grid;place-items:center;transform-origin:50% 88%}
-.pic img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 3px rgba(0,0,0,.18));pointer-events:none}
-.pic .emo{font-size:calc(var(--s) * .72);line-height:1;pointer-events:none}
+.pic{--s:96px;width:var(--s);height:var(--s);min-width:0;min-height:0;max-width:100%;position:relative;flex:none;display:block;z-index:0}
+.bod{position:absolute;inset:0;transform-origin:50% 88%}
+.pic img{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:contain;object-position:50% 100%;filter:drop-shadow(0 3px 2px rgba(0,0,0,.16));pointer-events:none}
+.pic img.px{image-rendering:pixelated;image-rendering:crisp-edges}
+.pic .emo{position:absolute;inset:0;display:grid;place-items:center;font-size:calc(var(--s) * .72);line-height:1;pointer-events:none}
+/* teks selalu di atas gambar Pokémon */
+.opt b,.tile b,.tile small,.dexc b,.dexc small,.party h2,.party p,.lvb,.cnt .tag{position:relative;z-index:2}
+.opt,.tile,.dexc,.cnt,.card,.hole{isolation:isolate}
 .live .bod{animation:breathe 2.4s ease-in-out infinite}
 .still .bod{animation:idle 2.2s ease-in-out infinite}
 .calm .bod{animation:none}
@@ -124,13 +128,21 @@ img{max-width:100%;-webkit-user-drag:none}
 .popin{animation:popin .55s cubic-bezier(.2,1.4,.4,1) both}
 .enter{animation:enter .55s cubic-bezier(.2,1.2,.4,1) both}
 .nope{animation:shake .45s}
+.catchfly{z-index:45}
+.newtag{position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);background:var(--coral);color:var(--paper);font-family:var(--display);font-weight:800;font-size:14px;border-radius:999px;padding:1px 8px;white-space:nowrap}
+#dexBtn.bump2{animation:bump .5s 2}
+.opts.ord{flex-wrap:nowrap;gap:clamp(4px,1.6vw,16px);align-items:center;max-width:100%}
+.ord .opt{padding:6px;min-width:0}
+.ord .pic,.ordb .pic,.hole2 span{--s:clamp(46px,min(17vw,15vh),116px)}
+.hole2 span{display:grid;place-items:center;width:var(--s);height:var(--s);font-family:var(--display);font-weight:800;font-size:36px;opacity:.35}
+.ord .arrow{font-size:clamp(20px,5vw,34px);color:var(--paper);flex:none}
 .fx{position:fixed;left:0;top:0;pointer-events:none;z-index:40;font-size:28px;line-height:1;will-change:transform}
 
 /* tombol jawaban */
 .opts{display:flex;justify-content:center;gap:clamp(10px,3vw,24px);flex-wrap:wrap}
 .opt{background:var(--paper);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 6px 0 var(--sea-deep);border:4px solid transparent;transition:transform .12s,opacity .25s}
 .opt:active{transform:translateY(4px)}
-.opt b{font-family:var(--display);font-weight:800;font-size:clamp(14px,2.6vw,21px);max-width:9em;line-height:1.05;text-align:center}
+.opt b{font-family:var(--display);font-weight:800;font-size:clamp(13px,2.5vw,20px);max-width:7.5em;line-height:1.05;text-align:center;overflow-wrap:anywhere;background:var(--paper);border-radius:8px;padding:0 4px}
 .opt.no{opacity:.35}
 .opt.yes{border-color:var(--leaf)}
 .num{font-family:var(--display);font-weight:800;font-size:clamp(40px,9vmin,72px);min-width:clamp(80px,18vmin,130px);line-height:1;padding:12px}
@@ -245,7 +257,7 @@ img{max-width:100%;-webkit-user-drag:none}
 .hearts span.on{animation:bump .5s}
 .pet{position:relative;display:grid;place-items:center}
 .pet .pic{--s:min(46vmin,290px)}
-.pet .pic+.pic{position:absolute}
+.pet .pic+.pic{position:absolute;left:0;top:0}
 .pet.evo .pic img{filter:brightness(0) invert(1) drop-shadow(0 0 18px #fff) drop-shadow(0 0 30px #8be3ff)}
 .berries{display:flex;gap:clamp(8px,2vw,16px);flex-wrap:wrap;justify-content:center}
 .berry{font-size:clamp(40px,9vmin,64px);width:clamp(64px,14vmin,96px);height:clamp(64px,14vmin,96px);border-radius:50%;background:var(--paper);box-shadow:0 5px 0 var(--sea-deep);display:grid;place-items:center;line-height:1}
