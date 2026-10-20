@@ -1,39 +1,14 @@
-// Simpan semua file game supaya bisa dimainkan tanpa internet.
-const CACHE = 'laut-v1';
-const FILES = ['./', 'index.html', 'manifest.webmanifest',
-  'icons/apple-touch-icon.png',
-  'icons/favicon.png',
-  'icons/icon-192.png',
-  'icons/icon-512.png',
-  'icons/icon-maskable-512.png',
-  'img/1.webp',
-  'img/104.webp',
-  'img/111.webp',
-  'img/116.webp',
-  'img/118.webp',
-  'img/120.webp',
-  'img/129.webp',
-  'img/130.webp',
-  'img/131.webp',
-  'img/133.webp',
-  'img/134.webp',
-  'img/138.webp',
-  'img/140.webp',
-  'img/142.webp',
-  'img/143.webp',
-  'img/149.webp',
-  'img/25.webp',
-  'img/39.webp',
-  'img/4.webp',
-  'img/54.webp',
-  'img/7.webp',
-  'img/72.webp',
-  'img/86.webp',
-  'img/98.webp',
-];
+// Simpan file game supaya bisa dimainkan tanpa internet. Gambar dan sprite animasi
+// Pokémon disimpan saat pertama kali tampil.
+const CACHE = 'laut-v2';
+const SHELL = ['./', 'index.html', 'game.js', 'dex.js', 'manifest.webmanifest',
+  'icons/apple-touch-icon.png', 'icons/favicon.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png'];
+const FAVORITES = [1, 4, 7, 25, 39, 50, 54, 129, 132, 133, 142, 143, 147, 150, 151, 172, 175, 201, 321, 393, 778];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE)
+    .then(c => c.addAll(SHELL).then(() => c.addAll(FAVORITES.map(id => `img/${id}.webp`)).catch(() => {})))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -42,27 +17,26 @@ self.addEventListener('activate', e => {
     .then(() => self.clients.claim()));
 });
 
-// Halaman: ambil versi terbaru kalau ada internet, kalau tidak pakai simpanan.
-// File lain (gambar, ikon, font): pakai simpanan dulu, unduh kalau belum ada.
+const CACHED_HOSTS = /^(fonts\.googleapis\.com|fonts\.gstatic\.com|raw\.githubusercontent\.com)$/;
+
+// Halaman dan kode: versi terbaru kalau ada internet, kalau tidak pakai simpanan.
+// Gambar, sprite, font: pakai simpanan dulu, unduh kalau belum ada.
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  const font = /fonts\.(googleapis|gstatic)\.com$/.test(url.hostname);
-  if (url.origin !== location.origin && !font) return;
-  if (req.mode === 'navigate') {
+  const same = url.origin === location.origin;
+  if (!same && !CACHED_HOSTS.test(url.hostname)) return;
+  const fresh = same && (req.mode === 'navigate' || /\.(js|html|webmanifest)$/.test(url.pathname) || url.pathname.endsWith('/'));
+  if (fresh) {
     e.respondWith(fetch(req).then(res => {
-      const copy = res.clone();
-      caches.open(CACHE).then(c => c.put('index.html', copy));
+      if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req.mode === 'navigate' ? 'index.html' : req, copy)); }
       return res;
-    }).catch(() => caches.match('index.html')));
+    }).catch(() => caches.match(req.mode === 'navigate' ? 'index.html' : req, { ignoreSearch: true })));
     return;
   }
   e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => {
-    if (res.ok || res.type === 'opaque') {
-      const copy = res.clone();
-      caches.open(CACHE).then(c => c.put(req, copy));
-    }
+    if (res.ok || res.type === 'opaque') { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
     return res;
   })));
 });
