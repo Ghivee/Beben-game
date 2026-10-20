@@ -1,13 +1,13 @@
 // Simpan file game supaya bisa dimainkan tanpa internet. Gambar dan sprite animasi
 // Pokémon disimpan saat pertama kali tampil.
-const CACHE = 'laut-v3';
-const SHELL = ['./', 'index.html', 'game.js', 'dex.js', 'manifest.webmanifest',
+const CACHE = 'laut-v4';
+const SHELL = ['./', 'index.html', 'game.js', 'lines.js', 'dex.js', 'manifest.webmanifest',
   'icons/apple-touch-icon.png', 'icons/favicon.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png'];
 const FAVORITES = [1, 4, 7, 25, 39, 50, 54, 129, 132, 133, 142, 143, 147, 150, 151, 172, 175, 201, 321, 393, 778];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE)
-    .then(c => c.addAll(SHELL).then(() => c.addAll(FAVORITES.map(id => `img/${id}.webp`)).catch(() => {})))
+    .then(c => c.addAll(SHELL).then(() => c.addAll(FAVORITES.flatMap(id => [`img/${id}.webp`, `hd/${id}.webp`])).catch(() => {})))
     .then(() => self.skipWaiting()));
 });
 
