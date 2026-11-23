@@ -1,25 +1,27 @@
 # Petualangan Laut Pokémon
 
-19 mini-game Pokémon untuk anak 5 tahun, masing-masing dengan 5 level. Koleksinya berisi Pokédex lengkap: 1025 Pokémon dari Kanto sampai Paldea, dengan gambar resmi beresolusi tinggi dan gerakan halus.
+Nineteen Pokémon mini-games for a five-year-old, each with five levels. It includes a full Pokédex of 1025 Pokémon from Kanto to Paldea with official artwork. This is a fan project and is not affiliated with Nintendo or The Pokémon Company.
 
-- **Narator dua bahasa:** Indonesia dan Inggris, berupa rekaman suara neural. Inggris memakai Kokoro (suara "Heart"), Indonesia memakai Piper (`id_ID-news_tts`). Kalau ada rekaman yang belum tersedia, game memakai suara perangkat.
-- **Musik tema "Ombak Pelangi":** dimainkan langsung oleh synthesizer di dalam game, dengan marimba, bas, pad, dan shaker. Volumenya mengecil saat narator bicara.
-- **Data per perangkat:** bintang, level, dan koleksi tersimpan di browser HP atau tablet masing-masing.
-- Bisa dipasang di iPhone dan Android, dan bisa dimainkan tanpa internet.
+[Bahasa Indonesia](README.id.md)
 
-Main: https://ghivee.github.io/Beben-game/
+- Bilingual narrator in Indonesian and English, recorded with neural voices: Kokoro (voice "Heart") for English and Piper (`id_ID-news_tts`) for Indonesian.
+- Theme music "Ombak Pelangi" played live by an in-game synthesizer (marimba, bass, pad, shaker). It gets quieter while the narrator speaks.
+- Stars, levels and the collection are stored in the browser of each phone or tablet.
+- Installable on iPhone and Android, and playable offline.
 
-Pasang di HP: buka alamat di atas di Safari (iPhone: Bagikan → Tambah ke Layar Utama) atau Chrome (Android: ketuk **📲 Pasang di HP** → Instal).
+Play: https://ghivee.github.io/Beben-game/
 
-## Isi folder
+Install on a phone: open the address in Safari (iPhone: Share, then Add to Home Screen) or Chrome (Android: tap the install button in the game, then Install).
 
-| Path | Isi |
-|---|---|
-| `index.html`, `game.js` | Tampilan dan logika game |
-| `lines.js` | Semua kalimat narator (id/en). Rekaman suara dibuat dari file ini |
-| `dex.js` | Data 1025 Pokémon |
-| `img/`, `hd/` | Gambar Pokémon 256 px dan 512 px |
-| `audio/id`, `audio/en` | Rekaman narator, beserta `index.json` per bahasa |
-| `sw.js`, `manifest.webmanifest`, `icons/` | Pemasangan aplikasi dan mode offline |
+## Contents
 
-Game diterbitkan otomatis ke GitHub Pages lewat `.github/workflows/pages.yml` setiap ada perubahan di `main`.
+| Path | What it holds |
+| --- | --- |
+| `index.html`, `game.js` | Interface and game logic |
+| `lines.js` | Every narrator line (id and en). The voice recordings are generated from this file |
+| `dex.js` | Data for the 1025 Pokémon |
+| `img/`, `hd/` | Pokémon images at 256 px and 512 px |
+| `audio/id`, `audio/en` | Narrator recordings and an `index.json` per language |
+| `sw.js`, `manifest.webmanifest`, `icons/` | App installation and offline mode |
+
+The game is published to GitHub Pages by `.github/workflows/pages.yml` on every change to `main`.
